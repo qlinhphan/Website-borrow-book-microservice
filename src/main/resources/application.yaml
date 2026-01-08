@@ -1,0 +1,21 @@
+server:
+  port: 8003
+
+
+spring:
+  application:
+    name: API-GATEWAY-SERVICE
+  cloud:
+    gateway:
+      routes:
+        - id: DEMO-SERVICE
+          uri: http://localhost:8000
+          predicates:
+            - Path=/v1/users/**
+          filters:
+          - name: RequestRateLimiter
+            args:
+              redis-rate-limiter.replenishRate: 10
+              redis-rate-limiter.burstCapacity: 21
+              redis-rate-limiter.requestedTokens: 1
+          - QlinhFilter

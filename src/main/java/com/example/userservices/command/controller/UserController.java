@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.commonservices.service.SendMessageKafka;
 import com.example.userservices.command.command.CommandCreateUser;
 import com.example.userservices.command.command.CommandDeleteUser;
 import com.example.userservices.command.command.CommandUpdateUser;
 import com.example.userservices.command.model.ModelCreateUser;
 import com.example.userservices.command.model.ModelDeleteUser;
 import com.example.userservices.command.model.ModelUpdateUser;
+import com.netflix.discovery.converters.Auto;
 
 import jakarta.validation.Valid;
 
@@ -29,6 +31,9 @@ public class UserController {
     @Autowired
     private CommandGateway commandGateway;
 
+    @Autowired
+    private SendMessageKafka sendMessageKafka;
+
     @PostMapping
     public String createUser(@Valid @RequestBody ModelCreateUser modelCreateUser) {
         CommandCreateUser command = new CommandCreateUser();
@@ -38,6 +43,8 @@ public class UserController {
         command.setKin(modelCreateUser.getKin());
         command.setDiscipline(false);
         this.commandGateway.sendAndWait(command);
+
+        this.sendMessageKafka.sendMessage("you just have add a user");
 
         return "create user successfully";
     }

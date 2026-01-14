@@ -1,6 +1,7 @@
 package com.example.bookservices.command.aggregate;
 
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
@@ -12,6 +13,8 @@ import com.example.bookservices.command.command.CommandUpdateBook;
 import com.example.bookservices.command.event.EventCreateBook;
 import com.example.bookservices.command.event.EventDeleteBook;
 import com.example.bookservices.command.event.EventUpdateBook;
+import com.example.commonservices.command.book.CommandUpdateSttBook;
+import com.example.commonservices.command.book.EventUpdateSttBook;
 
 import lombok.NoArgsConstructor;
 
@@ -77,4 +80,24 @@ public class BookAggregate {
         this.name = null;
         this.ready = false;
     }
+
+    @CommandHandler
+    public void handler(CommandUpdateSttBook command) {
+        EventUpdateSttBook event = new EventUpdateSttBook();
+        event.setId(command.getId());
+        event.setAuthor(command.getAuthor());
+        event.setName(command.getName());
+        event.setReady(command.isReady());
+
+        AggregateLifecycle.apply(event);
+    }
+
+    @EventSourcingHandler
+    public void esh(EventUpdateSttBook event) {
+        this.id = event.getId();
+        this.author = event.getAuthor();
+        this.name = event.getName();
+        this.ready = event.isReady();
+    }
+
 }

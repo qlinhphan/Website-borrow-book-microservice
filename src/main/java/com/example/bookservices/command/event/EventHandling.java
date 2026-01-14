@@ -6,8 +6,10 @@ import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.example.bookservices.command.command.CommandUpdateBook;
 import com.example.bookservices.command.data.Book;
 import com.example.bookservices.command.data.BookRepository;
+import com.example.commonservices.command.book.EventUpdateSttBook;
 
 @Component
 public class EventHandling {
@@ -46,4 +48,16 @@ public class EventHandling {
             this.bookRepository.delete(x);
         });
     }
+
+    @EventHandler
+    public void handle(EventUpdateSttBook event) {
+        Optional<Book> bookFindById = this.bookRepository.findById(event.getId());
+        bookFindById.ifPresent(x -> {
+            x.setId(event.getId());
+            x.setReady(event.isReady());
+
+            this.bookRepository.save(x);
+        });
+    }
+
 }
